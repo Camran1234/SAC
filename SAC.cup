@@ -1,0 +1,211 @@
+package parser;
+import Modelos.Asignacion;
+import java_cup.runtime.Symbol;
+import Modelos.Catedratico;
+import Modelos.Curso;
+import Modelos.Edificio;
+import Modelos.Estudiante;
+import Modelos.Horario;
+import Modelos.Salon;
+import Modelos.Usuario;
+import java_cup.runtime.Symbol;
+import java_cup.runtime.XMLElement;
+import java_cup.runtime.XMLElement;
+
+parser code {:
+    
+:}
+
+terminal ASIGNAR, HORARIO, CURSO, SALON, EDIFICIO, CATEDRATICO, ESTUDIANTE, USER, COLON, COMA, 
+OPEN_C, CLOSE_C, NUMBER, STRING, WORD;
+
+non terminal  user;
+non terminal  student;
+non terminal  professor;
+non terminal  building;
+non terminal  salon;
+non terminal  course;
+non terminal  time;
+non terminal  insert;
+non terminal  s;
+
+start with s;
+
+s ::= s user 
+    | s student 
+    | s professor 
+    | s building 
+    | s salon 
+    | s course 
+    | s time 
+    | s insert 
+    |/*empty*/;
+
+
+
+
+user ::= USER OPEN_C NUMBER:a COMA STRING:b COMA STRING:c COMA WORD:d CLOSE_C COLON
+        {:
+            //Usuario(1, "Colaborador1", "12345", colaborador);
+            //(long id, String nombre, String direccion, String password, boolean canLog,boolean esEstudiante)
+            //Long.parseLong(nombre)
+            try{
+                System.out.println("Iniciando Usuario");
+                long id = Long.parseLong(String.valueOf(a));
+                String nombre = String.valueOf(b);
+                nombre = nombre.substring(1, nombre.length() - 1);
+                String direccion = "";
+                String password = String.valueOf(c);
+                password = password.substring(1, password.length() - 1);
+                String estudianteOrNot = String.valueOf(d);
+                boolean respuesta=false;
+                //true for student
+                //false for colaborator
+                if(estudianteOrNot.equalsIgnoreCase("colaborador")){
+                    respuesta = true;
+                }else if(estudianteOrNot.equalsIgnoreCase("estudiante")){
+                    respuesta = false;
+                }
+                password = password.substring(1, password.length()-1);
+                Usuario usuario = new Usuario(id, nombre, direccion, password, true, respuesta);
+                Controlador.Estructuras.agregarUsuario(usuario);
+                System.out.println("Se agrego Usuario");
+            }catch(Exception ex){
+                ex.printStackTrace();
+                ex.getMessage();
+            }
+            
+        :}
+        ;
+
+student ::= ESTUDIANTE OPEN_C NUMBER:a COMA STRING:b COMA STRING:c CLOSE_C COLON {:
+            //public Estudiante(long id, String nombre, String direccion)
+            try{    
+                System.out.println("Inicio Estudiante");
+                long id = Long.parseLong(String.valueOf(a));
+                String nombre = String.valueOf(b);
+                nombre = nombre.substring(1, nombre.length() - 1);
+                String direccion = String.valueOf(c);
+                direccion = direccion.substring(1, direccion.length() - 1);
+                Estudiante usuario = new Estudiante(id,nombre, direccion);
+                Controlador.Estructuras.agregarEstudiante(usuario);
+                System.out.println("Se agrego estudiante");
+            }catch(Exception ex){
+                ex.printStackTrace();
+                ex.getMessage();
+            }
+            :};
+
+professor ::= CATEDRATICO OPEN_C NUMBER:a COMA STRING:b COMA STRING:c CLOSE_C COLON {:
+            //public Catedratico(int id, String nombre, String direccion) 
+            try{    
+                System.out.println("Iniciando Profesor");
+                int id = Integer.parseInt(String.valueOf(a));
+                String nombre = String.valueOf(b);
+                nombre = nombre.substring(1, nombre.length() - 1);
+                String direccion = String.valueOf(c);
+                direccion = direccion.substring(1, direccion.length() - 1);
+                Catedratico usuario = new Catedratico(id, nombre, direccion);
+                Controlador.Estructuras.insertarCatedratico(usuario);
+                System.out.println("Se agrego el profesor");
+            }catch(Exception ex){
+                ex.printStackTrace();
+                ex.getMessage();
+            }
+            :};
+
+building ::= EDIFICIO OPEN_C STRING:f CLOSE_C COLON {:
+            try{
+                System.out.println("Iniciando Edificio");
+                String lugar = String.valueOf(f);
+                lugar = lugar.substring(1, lugar.length() - 1);
+                Edificio edificio = new Edificio(lugar);
+                Controlador.Estructuras.agregarEdificio(edificio);
+                System.out.println("Se agrego el Edificio");
+            }catch(Exception ex){
+                ex.printStackTrace();
+                ex.getMessage();
+            }
+            :};
+
+salon ::= SALON OPEN_C STRING:a COMA NUMBER:b COMA NUMBER:c CLOSE_C COLON{:
+                try{
+                System.out.println("Inicio Salon");
+                //(String nombre,int id, int capacidad)
+                //Salon("T3", 30, 300);
+                String name = String.valueOf(a);
+                name = name.substring(1, name.length() - 1);
+                int id = Integer.parseInt(String.valueOf(b));
+                int capacidad = Integer.parseInt(String.valueOf(c));
+                Controlador.Estructuras.agregarSalon(name, new Salon(id,capacidad));
+                System.out.println("Se agrego SALON");
+                }catch(Exception ex){
+                    ex.printStackTrace();
+                ex.getMessage();
+                }
+        :};
+
+course ::= CURSO OPEN_C NUMBER:a COMA STRING:b COMA NUMBER:c COMA NUMBER:d CLOSE_C COLON{:
+
+                try{
+                    System.out.println("Inicio Curso");
+                    int codigo = Integer.parseInt(String.valueOf(a));
+                    String nombre = String.valueOf(b);
+                    nombre = nombre.substring(1, nombre.length() - 1);
+                    int semestre = Integer.parseInt(String.valueOf(c));
+                    int creditos = Integer.parseInt(String.valueOf(d));
+                    Curso curso = new Curso(codigo, nombre, semestre, creditos);
+                    Controlador.Estructuras.agregarCurso(curso);
+                    System.out.println("Se agrego curso");
+                }catch(Exception ex){
+                    ex.printStackTrace();
+                ex.getMessage();
+                }
+        :};
+
+time ::= HORARIO OPEN_C NUMBER:a COMA STRING:b COMA STRING:c COMA NUMBER:d COMA NUMBER:e COMA WORD:f COMA NUMBER:g CLOSE_C COLON{:
+            try{
+                System.out.println("Inicio Horario");
+                //(int codigo,String inicio,String fin,String dia,String edificio,int salon,int curso,int idCatedratico)
+                //Horario(31,"7:10am-8:00am","lunes",777,30,T3,100);
+                int codigo = Integer.parseInt(String.valueOf(a));
+                String hora = String.valueOf(b);
+                hora = hora.substring(1, hora.length() - 1);
+                String datos[] = hora.split("-");
+                String inicio = datos[0];
+                String fin = datos[1];
+                String dia = String.valueOf(c);
+                dia = dia.substring(1, dia.length() - 1);
+                int curso = Integer.parseInt(String.valueOf(d));
+                int salon = Integer.parseInt(String.valueOf(e));
+                String edificio = String.valueOf(f);
+                int identificacion = Integer.parseInt(String.valueOf(g));
+                Horario horario = new Horario(codigo, inicio, fin, dia, edificio, salon, curso, identificacion);
+                Controlador.Estructuras.agregarHorario(horario);
+                System.out.println("Se agrego Horario");
+            }catch(Exception ex){
+                ex.printStackTrace();
+                ex.getMessage();
+            }
+        :};
+
+insert ::= ASIGNAR OPEN_C NUMBER:a COMA NUMBER:b COMA NUMBER:c COMA NUMBER:d CLOSE_C COLON{:
+            try{
+                System.out.println("Inicio Insert");
+                //Asignar (200145785, 1, 30, 25);
+                // carne, curso, zona, final
+                //(int asignacion,int zona, int examenFinal,Horario horario)
+                int carne = Integer.parseInt(String.valueOf(a));
+                int horario = Integer.parseInt(String.valueOf(b));
+                int zona = Integer.parseInt(String.valueOf(c));
+                int fin = Integer.parseInt(String.valueOf(d));
+
+                Controlador.Estructuras.asignarCurso(carne,horario, zona, fin );
+                System.out.println("Se agrego Insert");
+            }catch(Exception ex){
+                ex.printStackTrace();
+                ex.getMessage();
+            }
+            
+            
+        :};
